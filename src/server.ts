@@ -5,7 +5,7 @@ import express, {
   type Response,
 } from "express";
 
-import { Pool } from "pg";
+import { Pool, Result } from "pg";
 import sendResponse from "./utility/sendResponse";
 import cors from "cors";
 import globalErrorHandler from "./middleware/globalErrorHandler";
@@ -108,6 +108,41 @@ app.get("/api/users", async (req: Request, res: Response) => {
       success: false,
       message: error.message,
       data: error,
+    });
+  }
+});
+
+app.get("/api/users/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `
+      SELECT * FROM users WHERE id=$1
+      `,
+      [id],
+    );
+
+    if (result.rows.length === 0) {
+      sendResponse(res, {
+        statuscode: 404,
+        success: false,
+        message: "user not found!",
+        data: {},
+      });
+    }
+
+    sendResponse(res, {
+      statuscode: 200,
+      success: true,
+      message: "user retrieved successfully!",
+      data: result.rows[0],
+    });
+  } catch (error: any) {
+    sendResponse(res, {
+      statuscode: 500,
+      success: false,
+      message: error.message,
+      error: error,
     });
   }
 });
