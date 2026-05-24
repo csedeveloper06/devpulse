@@ -9,9 +9,10 @@ import { Pool, Result } from "pg";
 import sendResponse from "./utility/sendResponse";
 import cors from "cors";
 import globalErrorHandler from "./middleware/globalErrorHandler";
+import config from "./config";
 
 const app: Application = express();
-const port = 5000;
+const port = config.port;
 
 //middlewares
 
@@ -19,8 +20,7 @@ app.use(express.json());
 app.use(cors({ origin: "http://localhost:3000" }));
 
 const pool = new Pool({
-  connectionString:
-    "postgresql://neondb_owner:npg_A4piLJTQf6Ss@ep-late-smoke-ap8ah5c0-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
+  connectionString: config.connection_string,
 });
 
 const initDB = async () => {
@@ -147,9 +147,85 @@ app.get("/api/users/:id", async (req: Request, res: Response) => {
   }
 });
 
+app.put("/api/users/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { first_name, last_name, email, password, is_active } = req.body;
+  try {
+    const result = await pool.query(
+      `
+        UPDATE users SET first_name=COALESCE($1,first_name),
+        last_name=COALESCE($2,last_name),
+        email=COALESCE($3,email),
+        password=COALESCE($4,password),
+        is_active=COALESCE($5,is_active)
+        WHERE id=$6 RETURNING *
+      `,
+      [first_name, last_name, email, password, is_active, id],
+    );
+
+    if (result.rows.length === 0) {
+      sendResponse(res, {
+        statuscode: 404,
+        success: false,
+        message: "user not found!",
+        data: {},
+      });
+    }
+
+    sendResponse(res, {
+      statuscode: 200,
+      success: true,
+      message: "user updated successfully!",
+      data: result.rows[0],
+    });
+  } catch (error: any) {
+    sendResponse(res, {
+      statuscode: 500,
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
+});
+
+app.delete("/api/users/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `
+      DELETE FROM users WHERE id=$1
+      `,
+      [id],
+    );
+
+    if (result.rowCount === 0) {
+      sendResponse(res, {
+        statuscode: 404,
+        success: false,
+        message: "user not found!",
+        data: {},
+      });
+    }
+
+    sendResponse(res, {
+      statuscode: 200,
+      success: true,
+      message: "user deleted successfully!",
+      data: {},
+    });
+  } catch (error: any) {
+    sendResponse(res, {
+      statuscode: 500,
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
+});
+
 // Global Error Handling Middleware
 app.use(globalErrorHandler);
 
-app.listen(port, () => {
-  console.log(`DevPulse app listening on port ${port}`);
+app.listen(config.port, () => {
+  console.log(`DevPulse app listening on port ${config.port}`);
 });
