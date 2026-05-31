@@ -5,19 +5,11 @@ import { userService } from "./users.service";
 const createUser = async (req: Request, res: Response) => {
   try {
     const result = await userService.createUserIntoDB(req.body);
-    const { name, user } = result;
     sendResponse(res, {
       statuscode: 201,
       success: true,
       message: "user created successfully!",
-      data: {
-        id: user.id,
-        name,
-        email: user.email,
-        password: user.password,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
-      },
+      data: result.rows[0],
     });
   } catch (error: any) {
     sendResponse(res, {

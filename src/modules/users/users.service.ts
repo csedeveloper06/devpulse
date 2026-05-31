@@ -1,19 +1,16 @@
 import { pool } from "../../db";
+import type { IUser } from "./users.interface";
 
-const createUserIntoDB = async (payload: any) => {
-  const { first_name, last_name, email, password } = payload;
+const createUserIntoDB = async (payload: IUser) => {
+  const { name, email, password, role } = payload;
 
   const result = await pool.query(
     `
-    INSERT INTO users( first_name,last_name,email,password ) VALUES($1,$2,$3,$4) RETURNING *
+    INSERT INTO users( name,email,password,role ) VALUES($1,$2,$3, COALESCE($4,'contributor'::user_role)) RETURNING *
     `,
-    [first_name, last_name, email, password],
+    [name, email, password, role],
   );
-
-  const user = result.rows[0];
-
-  const name = `${user.first_name} ${user.last_name}`;
-  return { user, name };
+  return result;
 };
 
 const getAllUsersFromDB = async () => {

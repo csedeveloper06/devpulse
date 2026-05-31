@@ -8,13 +8,22 @@ export const pool = new Pool({
 export const initDB = async () => {
   try {
     await pool.query(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1
+            FROM pg_type
+            WHERE typname = 'user_role'
+          ) THEN
+              CREATE TYPE user_role AS ENUM ('contributor', 'maintainer');
+          END IF;
+        END $$;
         CREATE TABLE IF NOT EXISTS users(
           id SERIAL PRIMARY KEY,
-          first_name VARCHAR(100) NOT NULL,
-          last_name VARCHAR(100) NOT NULL,
-          email VARCHAR(30) UNIQUE NOT NULL,
-          password VARCHAR(30) NOT NULL,
-          is_active BOOLEAN DEFAULT true,
+          name VARCHAR(100) NOT NULL,
+          email VARCHAR(100) UNIQUE NOT NULL,
+          password VARCHAR(100) NOT NULL,
+          role user_role NOT NULL DEFAULT 'contributor',
           created_at TIMESTAMP DEFAULT NOW(),
           updated_at TIMESTAMP DEFAULT NOW()
         )

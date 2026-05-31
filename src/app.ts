@@ -3,8 +3,6 @@ import express, {
   type Request,
   type Response,
 } from "express";
-
-import sendResponse from "./utility/sendResponse";
 import cors from "cors";
 import globalErrorHandler from "./middleware/globalErrorHandler";
 import { userRoute } from "./modules/users/users.route";
@@ -12,7 +10,6 @@ import { userRoute } from "./modules/users/users.route";
 const app: Application = express();
 
 //middlewares
-
 app.use(express.json());
 app.use(cors({ origin: "http://localhost:3000" }));
 
