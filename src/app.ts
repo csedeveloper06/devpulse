@@ -8,6 +8,7 @@ import globalErrorHandler from "./middleware/globalErrorHandler";
 import { userRoute } from "./modules/users/users.route";
 import { issueRoute } from "./modules/issues/issues.route";
 import { authRoute } from "./modules/auth/auth.route";
+import fs from "fs";
 
 const app: Application = express();
 
