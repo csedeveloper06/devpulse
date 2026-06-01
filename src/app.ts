@@ -7,6 +7,7 @@ import cors from "cors";
 import globalErrorHandler from "./middleware/globalErrorHandler";
 import { userRoute } from "./modules/users/users.route";
 import { issueRoute } from "./modules/issues/issues.route";
+import { authRoute } from "./modules/auth/auth.route";
 
 const app: Application = express();
 
@@ -16,6 +17,7 @@ app.use(cors({ origin: "http://localhost:3000" }));
 
 app.use("/api/users", userRoute);
 app.use("/api/issues", issueRoute);
+app.use("/api/auth", authRoute);
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({

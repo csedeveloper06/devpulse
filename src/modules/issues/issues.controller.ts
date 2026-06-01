@@ -14,7 +14,7 @@ const createIssue = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     sendResponse(res, {
-      statuscode: 201,
+      statuscode: 500,
       success: false,
       message: error.message,
       error: error,

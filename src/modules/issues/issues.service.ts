@@ -4,6 +4,19 @@ import { pool } from "../../db";
 const createIssueIntoDB = async (payload: IIssue) => {
   const { title, description, type, reporter_id } = payload;
 
+  const reporter = await pool.query(
+    `
+
+    SELECT * FROM users WHERE id=$1
+
+    `,
+    [reporter_id],
+  );
+
+  if (reporter.rows.length === 0) {
+    throw new Error("user is not exists!");
+  }
+
   const result = await pool.query(
     `
       INSERT INTO issues( title,description,type, reporter_id ) VALUES($1,$2,$3,$4) RETURNING *
