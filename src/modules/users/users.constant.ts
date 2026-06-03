@@ -1,6 +1,4 @@
 export const USER_ROLE = {
-  maintainer: "maintainer",
-  contributor: "contributor",
+  MAINTAINER: "maintainer",
+  CONTRIBUTOR: "contributor",
 };
-
-export type Roles = "maintainer" | "contributor";

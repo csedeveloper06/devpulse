@@ -8,11 +8,12 @@ import globalErrorHandler from "./middleware/globalErrorHandler";
 import { userRoute } from "./modules/users/users.route";
 import { issueRoute } from "./modules/issues/issues.route";
 import { authRoute } from "./modules/auth/auth.route";
-import fs from "fs";
+import CookieParser from "cookie-parser";
 
 const app: Application = express();
 
 //middlewares
+app.use(CookieParser());
 app.use(express.json());
 app.use(cors({ origin: "http://localhost:3000" }));
 

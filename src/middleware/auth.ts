@@ -3,9 +3,9 @@ import sendResponse from "../utility/sendResponse";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import config from "../config";
 import { pool } from "../db";
-import type { Roles } from "../modules/users/users.constant";
+import type { UserRole } from "../modules/users/users.interface";
 
-const auth = (...roles: Roles[]) => {
+const auth = (...roles: UserRole[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     console.log("roles : ", roles);
     try {
