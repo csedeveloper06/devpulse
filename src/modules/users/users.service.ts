@@ -5,6 +5,15 @@ import bcrypt from "bcryptjs";
 const createUserIntoDB = async (payload: IUser) => {
   const { name, email, password, role } = payload;
 
+  const existingUser = await pool.query(
+    `SELECT * FROM users WHERE email = $1`,
+    [email],
+  );
+
+  if (existingUser.rows.length > 0) {
+    throw new Error("BAD Request");
+  }
+
   const hashPassword = await bcrypt.hash(password, 10);
 
   const result = await pool.query(

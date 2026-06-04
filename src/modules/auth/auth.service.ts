@@ -3,6 +3,14 @@ import { pool } from "../../db";
 import type { TAuthLogin } from "./auth.interface";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import config from "../../config";
+import type { IUser } from "../users/users.interface";
+import { userService } from "../users/users.service";
+
+const signupUserIntoDB = async (payload: IUser) => {
+  const result = await userService.createUserIntoDB(payload);
+
+  return result;
+};
 
 const loginUserIntoDB = async (payload: TAuthLogin) => {
   const { email, password } = payload;
@@ -82,6 +90,7 @@ const generateRefreshToken = async (token: string) => {
 };
 
 export const authService = {
+  signupUserIntoDB,
   loginUserIntoDB,
   generateRefreshToken,
 };
