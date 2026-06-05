@@ -12,12 +12,12 @@ router.post(
   issueController.createIssue,
 );
 
-// router.get("/", issueController.createIssue);
+router.get("/", issueController.getAllIssues);
 
-// router.get("/:id", issueController.createIssue);
+router.get("/:id", issueController.getSingleIssue);
 
-// router.patch("/:id", issueController.createIssue);
+router.patch("/:id", issueController.UpdateIssue);
 
-// router.delete("/:id", issueController.createIssue);
+router.delete("/:id", issueController.deleteIssue);
 
 export const issueRoute = router;

@@ -1,5 +1,6 @@
 import type { IIssue } from "./issues.interface";
 import { pool } from "../../db";
+import { ISSUE_SELECT_WITH_REPORTER } from "./issues.query";
 
 const createIssueIntoDB = async (payload: IIssue) => {
   const { title, description, type, reporter_id } = payload;
@@ -13,9 +14,18 @@ const createIssueIntoDB = async (payload: IIssue) => {
   return result;
 };
 
-const getAllIssuesFromDB = async () => {};
+const getAllIssuesFromDB = async () => {
+  const result = await pool.query(ISSUE_SELECT_WITH_REPORTER);
+  return result;
+};
 
-const getSingleIssueFromDB = async () => {};
+const getSingleIssueFromDB = async (id: string) => {
+  const result = await pool.query(
+    `${ISSUE_SELECT_WITH_REPORTER} WHERE i.id = $1`,
+    [id],
+  );
+  return result;
+};
 
 //patch
 const updateIssueIntoDB = async () => {};

@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import sendResponse from "../../utility/sendResponse";
 import { issueService } from "./issues.service";
+import { formatIssue } from "../../utility/joinQuery";
 
 const createIssue = async (req: Request, res: Response) => {
   try {
@@ -38,9 +39,44 @@ const createIssue = async (req: Request, res: Response) => {
   }
 };
 
-const getAllIssues = async (req: Request, res: Response) => {};
+const getAllIssues = async (req: Request, res: Response) => {
+  try {
+    const result = await issueService.getAllIssuesFromDB();
+    sendResponse(res, {
+      statuscode: 201,
+      success: true,
+      message: "All issues retrieved successfully",
+      data: result.rows.map(formatIssue),
+    });
+  } catch (error: any) {
+    sendResponse(res, {
+      statuscode: 500,
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
+};
 
-const getSingleIssue = async (req: Request, res: Response) => {};
+const getSingleIssue = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const result = await issueService.getSingleIssueFromDB(id as string);
+    sendResponse(res, {
+      statuscode: 201,
+      success: true,
+      message: "Single issue retrieved successfully",
+      data: formatIssue(result.rows[0]),
+    });
+  } catch (error: any) {
+    sendResponse(res, {
+      statuscode: 500,
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
+};
 
 const UpdateIssue = async (req: Request, res: Response) => {};
 
