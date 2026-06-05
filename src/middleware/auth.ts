@@ -7,12 +7,12 @@ import type { UserRole } from "../modules/users/users.interface";
 
 const auth = (...roles: UserRole[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    console.log("roles : ", roles);
+    // console.log("roles : ", roles);
     try {
       const token = req.headers.authorization;
 
       if (!token) {
-        sendResponse(res, {
+        return sendResponse(res, {
           statuscode: 401,
           success: false,
           message: "UnAuthorized Access!!",
@@ -35,7 +35,7 @@ const auth = (...roles: UserRole[]) => {
       console.log(user);
 
       if (userData.rows.length === 0) {
-        sendResponse(res, {
+        return sendResponse(res, {
           statuscode: 404,
           success: false,
           message: "User Not Found!",
@@ -43,7 +43,7 @@ const auth = (...roles: UserRole[]) => {
       }
 
       if (roles.length && !roles.includes(user.role)) {
-        sendResponse(res, {
+        return sendResponse(res, {
           statuscode: 403,
           success: false,
           message: "Forbidden Access!!",
@@ -51,6 +51,9 @@ const auth = (...roles: UserRole[]) => {
       }
 
       req.user = decoded;
+
+      console.log("Decoded User:", decoded);
+      console.log("req.user before next:", req.user);
 
       next();
     } catch (error) {
