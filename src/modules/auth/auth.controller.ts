@@ -26,19 +26,21 @@ const loginUser = async (req: Request, res: Response) => {
   try {
     const result = await authService.loginUserIntoDB(req.body);
 
-    const { refreshToken } = result;
+    const { token, refreshToken, user } = result;
 
     res.cookie("refreshToken", refreshToken, {
-      secure: false, //* In production mode secure would be true
-      httpOnly: true,
+      secure: false,
       sameSite: "lax",
     });
 
     sendResponse(res, {
       statuscode: 201,
       success: true,
-      message: "user logged in successfully!",
-      data: result,
+      message: "Login successful",
+      data: {
+        token,
+        user,
+      },
     });
   } catch (error: any) {
     sendResponse(res, {

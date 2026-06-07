@@ -28,20 +28,20 @@ const loginUserIntoDB = async (payload: TAuthLogin) => {
     throw new Error("Invalid Credentials!");
   }
 
-  const user = userData.rows[0];
-  const matchPassword = await bcrypt.compare(password, user.password);
+  const userInfo = userData.rows[0];
+  const matchPassword = await bcrypt.compare(password, userInfo.password);
   if (!matchPassword) {
     throw new Error("Invalid Credentials!");
   }
 
   const jwtPayload = {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
+    id: userInfo.id,
+    name: userInfo.name,
+    email: userInfo.email,
+    role: userInfo.role,
   };
 
-  const accessToken = jwt.sign(jwtPayload, config.jwt_secret as string, {
+  const token = jwt.sign(jwtPayload, config.jwt_secret as string, {
     expiresIn: "10d",
   });
 
@@ -49,7 +49,16 @@ const loginUserIntoDB = async (payload: TAuthLogin) => {
     expiresIn: "100d",
   });
 
-  return { accessToken, refreshToken };
+  const user = {
+    id: userInfo.id,
+    name: userInfo.name,
+    email: userInfo.email,
+    role: userInfo.role,
+    created_at: userInfo.created_at,
+    updated_at: userInfo.updated_at,
+  };
+
+  return { token, refreshToken, user };
 };
 
 const generateRefreshToken = async (token: string) => {
