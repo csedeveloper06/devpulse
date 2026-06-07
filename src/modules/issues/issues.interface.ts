@@ -12,3 +12,7 @@ export interface IIssue {
   created_at: Date;
   updated_at: Date;
 }
+
+export type TUpdateIssue = Partial<
+  Pick<IIssue, "title" | "description" | "type">
+>;

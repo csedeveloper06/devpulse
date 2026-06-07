@@ -11,3 +11,9 @@ export type TAuthSignUp = {
   password: string;
   role: UserRole;
 };
+
+export interface TJwtPayload {
+  userId: number;
+  email: string;
+  role: "maintainer" | "contributor";
+}

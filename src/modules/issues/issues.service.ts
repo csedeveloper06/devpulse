@@ -1,6 +1,7 @@
-import type { IIssue } from "./issues.interface";
+import type { IIssue, TUpdateIssue } from "./issues.interface";
 import { pool } from "../../db";
 import { ISSUE_SELECT_WITH_REPORTER } from "./issues.query";
+import type { TJwtPayload } from "../auth/auth.interface";
 
 const createIssueIntoDB = async (payload: IIssue) => {
   const { title, description, type, reporter_id } = payload;
@@ -58,9 +59,65 @@ const getSingleIssueFromDB = async (id: string) => {
 };
 
 //patch
-const updateIssueIntoDB = async () => {};
+const updateIssueIntoDB = async (
+  id: string,
+  payload: TUpdateIssue,
+  user: TJwtPayload,
+) => {
+  const existingIssue = await pool.query(
+    `
+  SELECT *
+  FROM issues
+  WHERE id = $1
+  `,
+    [id],
+  );
 
-const deleteIssueFromDB = async () => {};
+  if (existingIssue.rows.length === 0) {
+    throw new Error("Issue not found");
+  }
+
+  const issue = existingIssue.rows[0];
+
+  if (user.role === "contributor") {
+    if (issue.reporter_id !== user.userId) {
+      throw new Error("You can update only your own issues");
+    }
+
+    if (issue.status !== "open") {
+      throw new Error("You can update only open issues");
+    }
+  }
+
+  const { title, description, type } = payload;
+
+  //? Optional: prevent empty update requests
+  if (title === undefined && description === undefined && type === undefined) {
+    throw new Error("At least one field must be provided for update");
+  }
+
+  const result = await pool.query(
+    `
+        UPDATE issues SET title=COALESCE($1,title),
+        description=COALESCE($2,description),
+        type=COALESCE($3,type),
+        updated_at = NOW()
+        WHERE id=$4 RETURNING *
+      `,
+    [title, description, type, id],
+  );
+  return result;
+};
+
+const deleteIssueFromDB = async (id: string) => {
+  const result = await pool.query(
+    `
+      DELETE FROM issues WHERE id=$1
+      `,
+    [id],
+  );
+  return result;
+};
 
 export const issueService = {
   createIssueIntoDB,

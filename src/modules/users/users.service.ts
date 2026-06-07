@@ -47,17 +47,15 @@ const getSingleUserFromDB = async (id: string) => {
 };
 
 const updateUserIntoDB = async (id: string, payload: any) => {
-  const { first_name, last_name, email, password, is_active } = payload;
+  const { name, email, password } = payload;
   const result = await pool.query(
     `
-        UPDATE users SET first_name=COALESCE($1,first_name),
-        last_name=COALESCE($2,last_name),
-        email=COALESCE($3,email),
-        password=COALESCE($4,password),
-        is_active=COALESCE($5,is_active)
-        WHERE id=$6 RETURNING *
+        UPDATE users SET name=COALESCE($1,name),
+        email=COALESCE($2,email),
+        password=COALESCE($3,password)
+        WHERE id=$4 RETURNING *
       `,
-    [first_name, last_name, email, password, is_active, id],
+    [name, email, password, id],
   );
   return result;
 };

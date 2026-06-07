@@ -2,6 +2,8 @@ import type { Request, Response } from "express";
 import sendResponse from "../../utility/sendResponse";
 import { issueService } from "./issues.service";
 import { formatIssue } from "../../utility/joinQuery";
+import { authService } from "../auth/auth.service";
+import type { TJwtPayload } from "../auth/auth.interface";
 
 const createIssue = async (req: Request, res: Response) => {
   try {
@@ -79,9 +81,53 @@ const getSingleIssue = async (req: Request, res: Response) => {
   }
 };
 
-const UpdateIssue = async (req: Request, res: Response) => {};
+const UpdateIssue = async (req: Request, res: Response) => {
+  const { id } = req.params;
 
-const deleteIssue = async (req: Request, res: Response) => {};
+  try {
+    const result = await issueService.updateIssueIntoDB(
+      id as string,
+      req.body,
+      req.user as TJwtPayload,
+    );
+    sendResponse(res, {
+      statuscode: 200,
+      success: true,
+      message: "Issue updated successfully",
+      data: result?.rows[0],
+    });
+  } catch (error: any) {
+    sendResponse(res, {
+      statuscode: 500,
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
+};
+
+const deleteIssue = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const result = await issueService.deleteIssueFromDB(id as string);
+    if (result.rowCount === 0) {
+      throw new Error("Issue Not Found!");
+    }
+    sendResponse(res, {
+      statuscode: 200,
+      success: true,
+      message: "Issue deleted successfully",
+      data: {},
+    });
+  } catch (error: any) {
+    sendResponse(res, {
+      statuscode: 500,
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
+};
 
 export const issueController = {
   createIssue,
