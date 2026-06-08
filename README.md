@@ -76,6 +76,10 @@ DevPulse is a community-driven issue tracking and project collaboration platform
 
 ### 🐛 Issues
 
+```http
+  http://localhost:5000
+```
+
 | Method | EndPoint        | Description      |
 | :----- | :-------------- | :--------------- |
 | POST   | /api/issues     | Create Issue     |
