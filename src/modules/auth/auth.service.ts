@@ -5,6 +5,8 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 import config from "../../config";
 import type { IUser } from "../users/users.interface";
 import { userService } from "../users/users.service";
+import AppError from "../../errors/AppError";
+import { HTTP_STATUS } from "../../constants/httpStatus";
 
 const signupUserIntoDB = async (payload: IUser) => {
   const result = await userService.createUserIntoDB(payload);
@@ -25,13 +27,13 @@ const loginUserIntoDB = async (payload: TAuthLogin) => {
   );
 
   if (userData.rows.length === 0) {
-    throw new Error("Invalid Credentials!");
+    throw new AppError(HTTP_STATUS.BAD_REQUEST, "Invalid Credentials!");
   }
 
   const userInfo = userData.rows[0];
   const matchPassword = await bcrypt.compare(password, userInfo.password);
   if (!matchPassword) {
-    throw new Error("Invalid Credentials!");
+    throw new AppError(HTTP_STATUS.BAD_REQUEST, "Invalid Credentials!");
   }
 
   const jwtPayload = {

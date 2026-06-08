@@ -2,6 +2,8 @@ import type { IIssue, TUpdateIssue } from "./issues.interface";
 import { pool } from "../../db";
 import { ISSUE_SELECT_WITH_REPORTER } from "./issues.query";
 import type { TJwtPayload } from "../auth/auth.interface";
+import AppError from "../../errors/AppError";
+import { HTTP_STATUS } from "../../constants/httpStatus";
 
 const createIssueIntoDB = async (payload: IIssue) => {
   const { title, description, type, reporter_id } = payload;
@@ -14,11 +16,6 @@ const createIssueIntoDB = async (payload: IIssue) => {
   );
   return result;
 };
-
-// const getAllIssuesFromDB = async () => {
-//   const result = await pool.query(ISSUE_SELECT_WITH_REPORTER);
-//   return result;
-// };
 
 const getAllIssuesFromDB = async (query: Record<string, unknown>) => {
   const { sort = "newest", type, status } = query;
@@ -74,18 +71,24 @@ const updateIssueIntoDB = async (
   );
 
   if (existingIssue.rows.length === 0) {
-    throw new Error("Issue not found");
+    throw new AppError(HTTP_STATUS.NOT_FOUND, "Issue not found");
   }
 
   const issue = existingIssue.rows[0];
 
   if (user.role === "contributor") {
     if (issue.reporter_id !== user.userId) {
-      throw new Error("You can update only your own issues");
+      throw new AppError(
+        HTTP_STATUS.FORBIDDEN,
+        "You can update only your own issues",
+      );
     }
 
     if (issue.status !== "open") {
-      throw new Error("You can update only open issues");
+      throw new AppError(
+        HTTP_STATUS.FORBIDDEN,
+        "You can update only open issues",
+      );
     }
   }
 
@@ -93,7 +96,10 @@ const updateIssueIntoDB = async (
 
   //? Optional: prevent empty update requests
   if (title === undefined && description === undefined && type === undefined) {
-    throw new Error("At least one field must be provided for update");
+    throw new AppError(
+      HTTP_STATUS.BAD_REQUEST,
+      "At least one field must be provided for update",
+    );
   }
 
   const result = await pool.query(

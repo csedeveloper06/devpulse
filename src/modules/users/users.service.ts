@@ -1,4 +1,6 @@
+import { HTTP_STATUS } from "../../constants/httpStatus";
 import { pool } from "../../db";
+import AppError from "../../errors/AppError";
 import type { IUser } from "./users.interface";
 import bcrypt from "bcryptjs";
 
@@ -11,7 +13,7 @@ const createUserIntoDB = async (payload: IUser) => {
   );
 
   if (existingUser.rows.length > 0) {
-    throw new Error("BAD Request");
+    throw new AppError(HTTP_STATUS.BAD_REQUEST, "BAD Request");
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
