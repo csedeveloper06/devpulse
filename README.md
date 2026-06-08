@@ -39,9 +39,84 @@ DevPulse is a community-driven issue tracking and project collaboration platform
 
 ### 🛠️ Tech Stack
 
--
--
--
--
--
--
+- Node.js
+- TypeScript
+- Express.js
+- PostgreSQL
+- Raw SQL
+- bcrypt
+- jsonwebtoken
+
+## 📡 API Endpoints
+
+#### 🔐 Authentication
+
+```http
+  http://localhost:5000
+```
+
+| Method | Endpoint                | Description               |
+| :----- | :---------------------- | :------------------------ |
+| POST   | /api/auth/register      | Register User             |
+| POST   | /api/auth/login         | Login User                |
+| POST   | /api/auth/refresh-token | Generate New Access Token |
+
+#### 👤 Users
+
+```http
+  http://localhost:5000
+```
+
+| Method | EndPoint       | Description     |
+| :----- | :------------- | :-------------- |
+| GET    | /api/users     | Get All Users   |
+| GET    | /api/users/:id | Get Single User |
+| PATCH  | /api/users/:id | Update User     |
+| DELETE | /api/users/:id | Delete User     |
+
+### 🐛 Issues
+
+| Method | EndPoint        | Description      |
+| :----- | :-------------- | :--------------- |
+| POST   | /api/issues     | Create Issue     |
+| GET    | /api/issues     | Get All Issues   |
+| GET    | /api/issues/:id | Get Single Issue |
+| PATCH  | /api/issues/:id | Update Issue     |
+| DELETE | /api/issues/:id | Delete Issue     |
+
+## 🗄️ Database Schema Summary
+
+### 👤 User Model
+
+| Field      | Type     |
+| :--------- | :------- |
+| id         | Serial   |
+| name       | String   |
+| email      | String   |
+| password   | String   |
+| role       | Enum     |
+| created_at | DateTime |
+| updated_at | DateTime |
+
+### 🐛 Issue Model
+
+| Field       | Type     |
+| :---------- | :------- |
+| id          | Serial   |
+| title       | String   |
+| description | Text     |
+| type        | Enum     |
+| status      | Enum     |
+| reporter_id | Int      |
+| created_at  | DateTime |
+| updated_at  | DateTime |
+
+## 🛡️ Error Handling
+
+- The application uses centralized error handling middleware to ensure consistent responses.
+
+## Example Response
+
+```javascript
+{ "success": false, "message": "Validation Error", "errors": error }
+```
